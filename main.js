@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 import { VRM, VRMLoaderPlugin } from '@pixiv/three-vrm';
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 import { API_KEY } from './config.js';
