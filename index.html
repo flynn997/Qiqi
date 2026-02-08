@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+        "@pixiv/three-vrm": "https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.0.0/lib/three-vrm.module.js"
+    }
+    }
+    </script>
+</head>
+<body>
+    <div id="app-container">
+        <div id="lbtn" class="lbtn"><img src="light.svg" id="light"></div>
+        <div id="dbtn" class="dbtn"><img src="dark.svg" id="dark"></div>
+        <div id="canvas-container">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div id="side-panel">
+            <div id="chat-history">
+                <div class="message bot">Hellow Im Qiqi</div>
+            </div>
+
+            <div id="input-area">
+                <input type="text" id="user-input" placeholder="say something...">
+                <button id="send-btn">send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
