@@ -254,20 +254,50 @@ function handleQiqiResponse(fullText) {
     chatHistory.appendChild(botDiv);
     chatHistory.scrollTop = chatHistory.scrollHeight;
 
-    const speech = new SpeechSynthesisUtterance(cleanText);
-    speech.lang = 'en-US';
+    async function speakWithElevenLabs(text) {
+        const VOICE_ID = "ocZQ262SsZb9RIxcQBOj"; // This is a default female voice, you can find "Anime" ones in their Voice Lab!
+        const API_KEY = "00fcb1dd55f52602e53145d8826bbda61b417a8fcddc3983126d5eb9dadecef3";
 
-    const mouthInterval = setInterval(() => {
-        if (window.speechSynthesis.speaking) {
-            mouthOpenTarget = 0.2 + (Math.random() * 0.6); 
-        } else {
-            mouthOpenTarget = 0;
-            clearInterval(mouthInterval);
+        try {
+            const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'xi-api-key': API_KEY
+                },
+                body: JSON.stringify({
+                    text: text,
+                    model_id: "eleven_monolingual_v1",
+                    voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+                })
+            });
+
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+
+            // --- MOUTH FLAP LOGIC ---
+            audio.onplay = () => {
+                const mouthInterval = setInterval(() => {
+                    if (!audio.paused && !audio.ended) {
+                        mouthOpenTarget = 0.2 + (Math.random() * 0.7);
+                    } else {
+                        mouthOpenTarget = 0;
+                        clearInterval(mouthInterval);
+                    }
+                }, 100);
+            };
+
+            audio.play();
+        } catch (error) {
+            console.error("ElevenLabs failed, falling back to basic voice:", error);
+            // Fallback to old speech synthesis if API fails/runs out
+            const fallback = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(fallback);
         }
-    }, 100);
+    }
 
-    window.speechSynthesis.speak(speech);
-
+    speakWithElevenLabs(cleanText);
 }
 
 //themee-----------------------------------
