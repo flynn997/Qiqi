@@ -33,14 +33,10 @@
 This project is an ongoing exploration of 3D web interfaces. Here’s what’s coming next:
 
 - [ ] **Phase 1: Animation Polish**
-  - Implement Mixamo-based transitions for more fluid body movement.
-  - Add a "Boredom Logic" (If no input for 30s, trigger idle animations).
-- [ ] **Phase 2: Technical Upgrades**
-  - Move to **Gemini 2.0 Flash** for faster response times.
-  - Implement a backend proxy to secure the API key properly.
+  - More animations
 - [ ] **Phase 3: Interactivity**
   - Add Voice Recognition (STT) so you can actually talk to Qiqi.
-  - Camera-based facial tracking (so she mimics your expressions).
+  - Camera-based facial tracking.
 
 ## 📦 Installation & Setup
 1. Clone the repo:
