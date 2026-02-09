@@ -29,6 +29,19 @@
 * **Lipsync Logic:** Built a custom bridge between the Web Speech API and the VRM `aa` expression for simulated yapping.
 * **API Security:** Restricted API keys via Google Cloud Console to ensure the live demo remains secure and functional.
 
+## 🗺️ Project Roadmap
+This project is an ongoing exploration of 3D web interfaces. Here’s what’s coming next:
+
+- [ ] **Phase 1: Animation Polish**
+  - Implement Mixamo-based transitions for more fluid body movement.
+  - Add a "Boredom Logic" (If no input for 30s, trigger idle animations).
+- [ ] **Phase 2: Technical Upgrades**
+  - Move to **Gemini 2.0 Flash** for faster response times.
+  - Implement a backend proxy to secure the API key properly.
+- [ ] **Phase 3: Interactivity**
+  - Add Voice Recognition (STT) so you can actually talk to Qiqi.
+  - Camera-based facial tracking (so she mimics your expressions).
+
 ## 📦 Installation & Setup
 1. Clone the repo:
    ```bash
