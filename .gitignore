@@ -1,2 +1,20 @@
-config.js
+# IDE / Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Dependencies (NEVER upload these, they are huge!)
+node_modules/
+
+# Production build (the folder created when you run npm run build)
+dist/
+
+# API Keys and Secrets (THE MOST IMPORTANT PART)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ghost file from earlier
+config.js
