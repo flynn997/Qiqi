@@ -2,7 +2,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 import { VRM, VRMLoaderPlugin } from '@pixiv/three-vrm';
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-import { CONFIG } from './config.js';
+
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
+const ELEVEN_API_KEY = import.meta.env.VITE_ELEVENLABS_KEY;
+const VOICE_ID = import.meta.env.VITE_VOICE_ID || "21m00Tcm4lcv85compute";
 
 let targetEmotion = "neutral";
 let emotionWeight = 0; 
@@ -192,7 +195,6 @@ function pickRandomAction() {
 
 setInterval(pickRandomAction, 5000);
 
-const GEMINI_API_KEY = CONFIG.GEMINI_KEY;
 const gen_AI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = gen_AI.getGenerativeModel({
     model: "gemini-2.5-flash-lite",
@@ -256,9 +258,6 @@ function handleQiqiResponse(fullText) {
     chatHistory.scrollTop = chatHistory.scrollHeight;
 
     async function speakWithElevenLabs(text) {
-        const ELEVEN_API_KEY = CONFIG.ELEVENLABS_KEY;
-        const VOICE_ID = CONFIG.VOICE_ID;
-
         try {
             console.log("🚀 Sending request to ElevenLabs...");
             
@@ -266,15 +265,14 @@ function handleQiqiResponse(fullText) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'xi-api-key': CONFIG.ELEVENLABS_KEY
+                    'xi-api-key': ELEVEN_API_KEY // Changed from CONFIG.ELEVENLABS_KEY
                 },
                 body: JSON.stringify({
                     text: text,
-                    // CHANGE THIS LINE:
                     model_id: "eleven_flash_v2_5", 
                     voice_settings: { 
                         stability: 0.5, 
-                        similarity_boost: 0.75, // Boost this for more personality
+                        similarity_boost: 0.75, 
                         style: 0.0,
                         use_speaker_boost: true
                     }
