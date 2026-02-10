@@ -5,6 +5,7 @@ import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
 const ELEVEN_API_KEY = import.meta.env.VITE_ELEVENLABS_KEY;
+console.log("Is Vite working?", import.meta.env);
 const VOICE_ID = import.meta.env.VITE_VOICE_ID || "21m00Tcm4lcv85compute";
 
 let targetEmotion = "neutral";
