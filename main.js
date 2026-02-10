@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 import { VRM, VRMLoaderPlugin } from '@pixiv/three-vrm';
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-import { API_KEY } from './config.js';
+import { CONFIG } from './config.js';
 
 let targetEmotion = "neutral";
 let emotionWeight = 0; 
@@ -192,9 +192,10 @@ function pickRandomAction() {
 
 setInterval(pickRandomAction, 5000);
 
-const gen_AI = new GoogleGenerativeAI(API_KEY);
+const GEMINI_API_KEY = CONFIG.GEMINI_KEY;
+const gen_AI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = gen_AI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-flash-lite",
     systemInstruction: "Your name is Qiqi. You are a helpful AI anime girl. Every time you respond, you MUST start your message with an emotion tag like [HAPPY], [SAD], [ANGRY], or [SURPRISED]. Keep your answers short and cute.",
 });
 
@@ -255,32 +256,56 @@ function handleQiqiResponse(fullText) {
     chatHistory.scrollTop = chatHistory.scrollHeight;
 
     async function speakWithElevenLabs(text) {
-        const VOICE_ID = "ocZQ262SsZb9RIxcQBOj"; // This is a default female voice, you can find "Anime" ones in their Voice Lab!
-        const API_KEY = "00fcb1dd55f52602e53145d8826bbda61b417a8fcddc3983126d5eb9dadecef3";
+        const ELEVEN_API_KEY = CONFIG.ELEVENLABS_KEY;
+        const VOICE_ID = CONFIG.VOICE_ID;
 
         try {
+            console.log("🚀 Sending request to ElevenLabs...");
+            
             const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'xi-api-key': API_KEY
+                    'xi-api-key': CONFIG.ELEVENLABS_KEY
                 },
                 body: JSON.stringify({
                     text: text,
-                    model_id: "eleven_monolingual_v1",
-                    voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+                    // CHANGE THIS LINE:
+                    model_id: "eleven_flash_v2_5", 
+                    voice_settings: { 
+                        stability: 0.5, 
+                        similarity_boost: 0.75, // Boost this for more personality
+                        style: 0.0,
+                        use_speaker_boost: true
+                    }
                 })
             });
 
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`❌ ElevenLabs Error ${response.status}:`, errorText);
+                throw new Error("API responded with an error");
+            }
+
+            console.log("✅ Audio received! Processing...");
             const audioBlob = await response.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
+            const audio = new Audio();
+            audio.src = audioUrl;
+            audio.volume = 1.0;
 
-            // --- MOUTH FLAP LOGIC ---
+            // This ensures the audio is fully loaded before we try to play
+            audio.oncanplaythrough = () => {
+                console.log("🔊 Audio is ready to scream!");
+                audio.play().catch(e => console.error("Playback failed:", e));
+            };
+
+            // Mouth flap logic starts when the audio actually starts playing
             audio.onplay = () => {
                 const mouthInterval = setInterval(() => {
                     if (!audio.paused && !audio.ended) {
-                        mouthOpenTarget = 0.2 + (Math.random() * 0.7);
+                        // Random flap between 0.2 and 0.8
+                        mouthOpenTarget = 0.2 + (Math.random() * 0.6); 
                     } else {
                         mouthOpenTarget = 0;
                         clearInterval(mouthInterval);
@@ -288,10 +313,9 @@ function handleQiqiResponse(fullText) {
                 }, 100);
             };
 
-            audio.play();
         } catch (error) {
-            console.error("ElevenLabs failed, falling back to basic voice:", error);
-            // Fallback to old speech synthesis if API fails/runs out
+            console.error("ElevenLabs failed:", error);
+            // Fallback so Qiqi isn't silent if the API hits a limit
             const fallback = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.speak(fallback);
         }
