@@ -52,6 +52,7 @@ loader.register((parser) => {
 loader.load(
     './model.vrm',
     (gltf) => {
+        console.log("Model loaded successfully!", gltf);
         const vrm = gltf.userData.vrm;
         currentVrm = vrm;
 
@@ -62,8 +63,8 @@ loader.load(
         vrm.scene.rotation.y = 0;
         console.log("Assis-chan is here!");
     },
-    (progress) => console.log('Loading...', (100.0 * progress.loaded / progress.total), '%'),
-    (error) => console.error(error)
+    (progress) => console.log('Loading progress:', progress.loaded / progress.total),
+    (error) => console.error("Model load FAILED:", error)
 );
 
 const clock = new THREE.Clock();
