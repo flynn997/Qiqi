@@ -1,14 +1,9 @@
-import { defineConfig } from 'vite';
+// vite.config.js
+import { defineConfig } from 'vite'
 
 export default defineConfig({
-  // reponme
-  base: '/your-repo-name/', 
-  
-  build: {
-    //makes sure your build is optimized
-    outDir: 'dist',
-  },
+  base: '/',  // ← hard-force to root in dev & build (remove any /your-repo-name/)
   server: {
-    port: 3000,
+    port: 3000  // if you want to keep 3000 instead of default 5173
   }
-});
+})
