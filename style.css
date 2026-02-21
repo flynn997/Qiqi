@@ -86,10 +86,10 @@ body.darkmode .bot{
   color: white;
 }
 
-.input-area{
-    padding: 20px;
+#input-area{
+    padding: 1px;
     display: flex;
-    gap: 10px;
+    gap: 1px;
 }
 
 input{
@@ -99,7 +99,7 @@ input{
     color: black;
     padding: 10px;
     border-radius: 5px;
-    margin: 5px;
+    margin: 2px;
 }
 
 body.darkmode input{
@@ -115,11 +115,28 @@ body.darkmode input{
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+    margin: 1px;
 }
 
+.dmbtn,.lmbtn{
+    background: rgb(219, 192, 255);
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 1px;
+}
+
+
 body.darkmode #send-btn{
-  background: rgb(105, 105, 255);
-  color: white;
+    background: rgb(105, 105, 255);
+    color: white;
+}
+
+body.darkmode .dmbtn,.lmbtn{
+    background: rgb(173, 110, 255);
+    color: white;
 }
 
 .user {
@@ -130,9 +147,9 @@ body.darkmode #send-btn{
 }
 
 body.darkmode .user{
-  background: rgb(59, 59, 59);
-  border: 1px solid #a1a1a15e;
-  color: white;
+    background: rgb(59, 59, 59);
+    border: 1px solid #a1a1a15e;
+    color: white;
 }
 
 .lbtn, .dbtn{
@@ -141,19 +158,28 @@ body.darkmode .user{
 }
 
 .dbtn{
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
 }
 
 .dbtn.hidden{
-  display: none;
+    display: none;
+}
+
+.dmbtn.hidden{
+    display: none;
 }
 
 .lbtn{
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.lmbtn{
+    border: none;
+    cursor: pointer;
+    display: none; 
 }

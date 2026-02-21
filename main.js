@@ -20,6 +20,7 @@ let targetElbowRY = 0;
 let targetWristRZ = 0;
 let targetFingerRotation = 0;
 let mouthOpenTarget = 0;
+let chatHistoryMemory = []; //shortterm memory
 
 window.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth) - 0.5;
@@ -61,7 +62,7 @@ loader.load(
         scene.add(vrm.scene);
 
         vrm.scene.rotation.y = 0;
-        console.log("Assis-chan is here!");
+        console.log("Qiqi is here!");
     },
     (progress) => console.log('Loading progress:', progress.loaded / progress.total),
     (error) => console.error("Model load FAILED:", error)
@@ -168,9 +169,12 @@ function animate() {
             leftArm.rotation.z = -1.2;
         }
 
-        const blinkScale = Math.max(0, Math.sin(elapsed * 1.5) * 20 - 18); 
-        currentVrm.expressionManager.setValue('blink', blinkScale);
-
+        if (targetEmotion === 'neutral' || emotionWeight < 0.5) {
+            const blinkScale = Math.max(0, Math.sin(elapsed * 1.5) * 20 - 18); 
+            currentVrm.expressionManager.setValue('blink', blinkScale);
+        } else {
+            currentVrm.expressionManager.setValue('blink', 0);
+        }
         currentVrm.update(deltaTime);
     }
     renderer.render(scene, camera);
@@ -204,10 +208,31 @@ const model = gen_AI.getGenerativeModel({
 });
 
 async function askQiqi(prompt) {
-    const chat = model.startChat({ history: [] });
+    //send the current history to gemini
+    const chat = model.startChat({
+        history: chatHistoryMemory, 
+    });
+
     const result = await chat.sendMessage(prompt);
     const response = await result.response;
-    return response.text();
+    const responseText = response.text();
+
+    // after getting the reply update the memory
+    updateMemory(prompt, responseText);
+
+    return responseText;
+}
+
+function updateMemory(userText, aiText) {
+    chatHistoryMemory.push({ role: "user", parts: [{ text: userText }] });
+    chatHistoryMemory.push({ role: "model", parts: [{ text: aiText }] });
+
+    if (chatHistoryMemory.length > 6) {
+        chatHistoryMemory.shift(); // remove oldest user msg
+        chatHistoryMemory.shift(); // remove oldest  reply
+    }
+    
+    console.log("Qiqi's Memory:", chatHistoryMemory);
 }
 
 const inputField = document.getElementById('user-input');
@@ -273,9 +298,9 @@ function handleQiqiResponse(fullText) {
                     text: text,
                     model_id: "eleven_flash_v2_5", 
                     voice_settings: { 
-                        stability: 0.5, 
-                        similarity_boost: 0.75, 
-                        style: 0.0,
+                        stability: 0.35, 
+                        similarity_boost: 0.85, 
+                        style: 0.5,
                         use_speaker_boost: true
                     }
                 })
@@ -294,17 +319,15 @@ function handleQiqiResponse(fullText) {
             audio.src = audioUrl;
             audio.volume = 1.0;
 
-            // This ensures the audio is fully loaded before we try to play
+            // This ensures audio fully loaded before we try to play
             audio.oncanplaythrough = () => {
-                console.log("🔊 Audio is ready to scream!");
+                console.log("Audio is ready to play!");
                 audio.play().catch(e => console.error("Playback failed:", e));
             };
 
-            // Mouth flap logic starts when the audio actually starts playing
             audio.onplay = () => {
                 const mouthInterval = setInterval(() => {
                     if (!audio.paused && !audio.ended) {
-                        // Random flap between 0.2 and 0.8
                         mouthOpenTarget = 0.2 + (Math.random() * 0.6); 
                     } else {
                         mouthOpenTarget = 0;
@@ -315,7 +338,6 @@ function handleQiqiResponse(fullText) {
 
         } catch (error) {
             console.error("ElevenLabs failed:", error);
-            // Fallback so Qiqi isn't silent if the API hits a limit
             const fallback = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.speak(fallback);
         }
@@ -324,24 +346,75 @@ function handleQiqiResponse(fullText) {
     speakWithElevenLabs(cleanText);
 }
 
+// Check if the browser supports Speech Recognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; 
+    recognition.interimResults = false; // Only send the final sentence
+
+    const micButtons = [
+    document.getElementById('lmbtn'),
+    document.getElementById('dmbtn')
+    ];
+
+    micButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        recognition.start();
+        btn.style.backgroundColor = "red";
+        console.log("Qiqi is listening...");
+    });
+    });
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log("You said:", transcript);
+        
+        inputField.value = transcript;
+        
+        sendBtn.click();
+        
+        micButtons.forEach(btn => {
+        btn.style.backgroundColor = ""; // Reset button color
+        });
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Speech Error:", event.error);
+        micBtn.style.backgroundColor = "";
+    };
+
+    recognition.onend = () => {
+        micBtn.style.backgroundColor = "";
+    };
+} else {
+    console.log("Speech Recognition not supported in this browser.");
+}
+
 //themee-----------------------------------
 //btns
 const lbtn = document.getElementById('lbtn');
 const dbtn = document.getElementById('dbtn');
-//parts
-const sidep = document.getElementById('side-panel');
+const lmbtn = document.getElementById('lmbtn');
+const dmbtn = document.getElementById('dmbtn');
 //other
-const showL = document.querySelector('.lbtn');
+const showL = document.querySelector('#lbtn');
+const showLM = document.querySelector('#lmbtn');
 const body = document.body;
 
 dbtn.addEventListener('click', function() {
-  body.classList.toggle('darkmode');
-  dbtn.classList.toggle('hidden');
-  showL.style.display = "block";
+    body.classList.toggle('darkmode');
+    dbtn.classList.toggle('hidden');
+    dmbtn.classList.toggle('hidden');
+    showL.style.display = "block";
+    showLM.style.display = "block";
 });
 
 lbtn.addEventListener('click', function() {
-  body.classList.toggle('darkmode');
-  dbtn.classList.toggle('hidden');
-  showL.style.display = "none";
+    body.classList.toggle('darkmode');
+    dbtn.classList.toggle('hidden');
+    dmbtn.classList.toggle('hidden');
+    showL.style.display = "none";
+    showLM.style.display = "none";
 });
