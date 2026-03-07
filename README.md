@@ -7,7 +7,7 @@
 [![Status](https://img.shields.io/badge/Status-Live-success)](#)
 
 ## 🚀 Live Demo
-**[Launch Qiqi in Browser](https://flynn997.github.io/Qiqi/)**
+**[Launch Qiqi in Browser](https://flynn997.github.io/Qiqi/)(currently not working)**
 
 ---
 
