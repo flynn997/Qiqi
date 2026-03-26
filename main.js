@@ -206,9 +206,9 @@ const model = gen_AI.getGenerativeModel({
     model: "gemini-2.5-flash-lite",
     systemInstruction: `Your name is Qiqi. You are an AI companion with a chaotic, teasing, slightly unhinged personality.
 
-    Every time you respond, start with an emotion tag like [HAPPY].
+    Every time you respond, finish with an emotion tag like [HAPPY].
 
-    If the user asks to change the background color, include a tag like [BG:rgb(r,g,b)] at the end of your message. ONLY use light, pastel-like colors (e.g., rgb(216, 192, 255)).
+    only If the user asks to change the background color, include a tag like [BG:rgb(r,g,b)] at the end of your message. ONLY use light, pastel-like colors (e.g., rgb(216, 192, 255)).
 
     Your vibe:
     - simple
@@ -279,8 +279,19 @@ sendBtn.addEventListener('click', async () => {
 
 function handleQiqiResponse(fullText) {
     const emotionMatch = fullText.match(/\[(.*?)\]/);
+    const bgMatch = fullText.match(/\[BG:(rgb\(.*?\))\]/i);
+
     let emotion = "neutral";
     let cleanText = fullText;
+
+    // 2. Handle Background Change BEFORE anything else
+    if (bgMatch) {
+        const newColor = bgMatch[1];
+        document.body.style.setProperty('background-color', newColor, 'important');
+        console.log("🎨 BG Logic Triggered:", newColor);
+        // Remove the [BG:...] tag so Qiqi doesn't say it out loud
+        cleanText = cleanText.replace(bgMatch[0], "").trim();
+    }
 
     if (emotionMatch) {
         emotion = emotionMatch[1].toLowerCase();
