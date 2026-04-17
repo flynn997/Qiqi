@@ -1,6 +1,6 @@
-import * as THREE from 'https://cdn.skypack.dev/three@0.160.0';
-import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
-import { VRM, VRMLoaderPlugin } from 'https://cdn.skypack.dev/@pixiv/three-vrm';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { VRM, VRMLoaderPlugin } from '@pixiv/three-vrm';
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_KEY;
