@@ -364,6 +364,23 @@ function handleQiqiResponse(fullText) {
         }
     }
 
+    // function converting **bold** and *italics* to HTML
+    function parseMarkdown(text) {
+        return text
+            .replace(/\*(.*?)\*/g, '<strong>$1</strong>') // **bold**
+            .replace(/\*\*(.*?)\*\*/g, '<em>$1</em>'); // *italics*
+    }
+
+    // apply the parsing
+    const formattedText = parseMarkdown(cleanText);
+
+    botDiv.className = "message bot";
+    // ❤️ use innerHTML instead of innerText so the <strong> tags work
+    botDiv.innerHTML = formattedText; 
+
+    chatHistory.appendChild(botDiv);
+
+
     speakWithElevenLabs(cleanText);
 }
 
