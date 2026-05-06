@@ -186,7 +186,7 @@ function pickRandomAction() {
     const actions = ['idle', 'lookAround', 'checkNails', 'nod'];
     currentAction = actions[Math.floor(Math.random() * actions.length)];
 
-    // If checking nails wont be looking at cam
+    // if checking nails wont be looking at cam
     if (currentAction === 'checkNails' || currentAction === 'lookAround') {
         mouseControlWeight = 0; 
     } else {
@@ -204,7 +204,9 @@ setInterval(pickRandomAction, 5000);
 const gen_AI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const model = gen_AI.getGenerativeModel({
     model: "gemini-2.5-flash-lite",
-    systemInstruction: `Your name is Qiqi. You are an AI companion with a chaotic, gremlin personality.
+    systemInstruction: 
+    `CRITICAL RULE: Only include the [BG:rgb(r,g,b)] tag if the user explicitly asks you to change the color or "theme." Otherwise, do NOT include any BG tags
+    Your name is Qiqi. You are an AI companion with a chaotic, gremlin personality.
 
     RULES:
     1. Every response MUST end with exactly ONE emotion tag from this list: [HAPPY], [SAD], [ANGRY], [SURPRISED], [NEUTRAL]. Do NOT invent new tags like [TEASING].
@@ -231,7 +233,7 @@ async function askQiqi(prompt) {
 }
 
 function updateMemory(userText, aiText) {
-    console.trace("Who called updateMemory?"); // 🔥 This will show the exact path
+    console.trace("Who called updateMemory?"); //show the exact path
     chatHistoryMemory.push({ role: "user", parts: [{ text: userText }] });
     chatHistoryMemory.push({ role: "model", parts: [{ text: aiText }] });
 
@@ -272,18 +274,18 @@ function handleQiqiResponse(fullText) {
     let emotion = "neutral";
     let cleanText = fullText;
 
-    // 2. Handle Background Change BEFORE anything else
+    // 2. handle bg change 
     if (bgMatch) {
         const newColor = bgMatch[1];
         document.body.style.setProperty('background-color', newColor, 'important');
         console.log("🎨 BG Logic Triggered:", newColor);
-        // Remove the [BG:...] tag so Qiqi doesn't say it out loud
+        // Remove [BG...]
         cleanText = cleanText.replace(bgMatch[0], "").trim();
     }
 
     if (emotionMatch) {
         emotion = emotionMatch[1].toLowerCase();
-        cleanText = fullText.replace(emotionMatch[0], "").trim();
+        cleanText = cleanText.replace(emotionMatch[0], "").trim();
     }
 
     if (currentVrm) {
@@ -327,11 +329,11 @@ function handleQiqiResponse(fullText) {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error(`❌ ElevenLabs Error ${response.status}:`, errorText);
+                console.error(`❌ elevenLabs error ${response.status}:`, errorText);
                 throw new Error("API responded with an error");
             }
 
-            console.log("✅ Audio received! Processing...");
+            console.log("✅ audio received! processing...");
             const audioBlob = await response.blob();
             const audioUrl = URL.createObjectURL(audioBlob);
             const audio = new Audio();
@@ -365,13 +367,13 @@ function handleQiqiResponse(fullText) {
     speakWithElevenLabs(cleanText);
 }
 
-// Check if the browser supports Speech Recognition
+// check if the browser supports speechrecognition
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US'; 
-    recognition.interimResults = false; // Only send the final sentence
+    recognition.interimResults = false; // only send the final sentence
 
     const micButtons = [
     document.getElementById('lmbtn'),
@@ -395,7 +397,7 @@ if (SpeechRecognition) {
         sendBtn.click();
         
         micButtons.forEach(btn => {
-        btn.style.backgroundColor = ""; // Reset button color
+        btn.style.backgroundColor = ""; // reset button color
         });
     };
 
