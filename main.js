@@ -375,7 +375,7 @@ function handleQiqiResponse(fullText) {
     const formattedText = parseMarkdown(cleanText);
 
     botDiv.className = "message bot";
-    // ❤️ use innerHTML instead of innerText so the <strong> tags work
+    // use innerHTML instead of innerText so the <strong> tags work
     botDiv.innerHTML = formattedText; 
 
     chatHistory.appendChild(botDiv);
